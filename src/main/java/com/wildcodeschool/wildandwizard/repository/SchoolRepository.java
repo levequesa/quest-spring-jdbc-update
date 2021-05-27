@@ -17,7 +17,26 @@ public class SchoolRepository {
 
     public School update(Long id, String name, Long capacity, String country) {
 
-        // TODO : update a school from the database
+    	Connection connection = null;
+    	PreparedStatement request = null;
+    	
+    	try {
+			connection =DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+			request = connection.prepareStatement("UPDATE school SET name=?, capacity=?, country=? WHERE id=?;");
+			request.setString(1, name);
+			request.setLong(2, capacity);
+			request.setString(3, country);
+			request.setLong(4, id);
+			if (request.executeUpdate()!=1) {
+				throw new SQLException("failed to update data");
+			}
+			return new School(id,name,capacity,country);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JdbcUtils.closeStatement(request);
+			JdbcUtils.closeConnection(connection);
+		}
         return null;
     }
 
